@@ -12,6 +12,45 @@ import sys
 import socket
 import threading
 
+# this is a pretty hex dumping function directly taken from
+# http://code.activestate.com/recipes/142812-hex-dumper/
+def hexdump(src, length=16):
+    result = []
+    digits = 4 if isinstance(src, unicode) else 2
+
+    for i in xrange(0, len(src), length):
+       s = src[i:i+length]
+       hexa = b' '.join(["%0*X" % (digits, ord(x))  for x in s])
+       text = b''.join([x if 0x20 <= ord(x) < 0x7F else b'.'  for x in s])
+       result.append( b"%04X   %-*s   %s" % (i, length*(digits + 1), hexa, text) )
+
+    print b'\n'.join(result)
+
+# here we manage to read the buffer
+def receive_from(connection):
+    buffer = ''
+    # we set a 2 seconds timeout; depending your target this may need to be adjusted
+    connection.settimeout(2)
+    try:
+        # keep reading until there is no more data
+        while True:
+            data = connection.recv(4096)
+            if not data:
+                break
+            buffer += data
+    except:
+        pass
+    return buffer
+
+# modify any requests destined for the remote host
+def request_handler(buffer):
+    return buffer
+
+# modify any responses destined for the local host
+def response_handler(buffer):
+    return buffer
+
+# our method that handled our local and remote connections
 def proxy_handler(client_socket, remote_host, remote_port, receive_first):
     # connect to the remote host
     remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
