@@ -54,7 +54,7 @@ def response_handler(buffer):
 def proxy_handler(client_socket, remote_host, remote_port, receive_first):
     # connect to the remote host
     remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    remote_socket.connect(remote_host, remote_port)
+    remote_socket.connect((remote_host, remote_port))
     
     # receive data from the remote end if necessary
     if receive_first:
